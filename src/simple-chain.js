@@ -1,46 +1,52 @@
-const { NotImplementedError } = require('../extensions/index.js');
+const { NotImplementedError } = require("../extensions/index.js");
 
 /**
  * Implement chainMaker object according to task description
- * 
+ *
  */
 const chainMaker = {
+  str: "",
+
   getLength() {
-    return this.res.length;
+    return this.str.split("~~").length;
   },
-   addLink(value='( )') {
-    this.res.push(value)
-    return this;
-  },
-   removeLink( position ) {
-      if (Number.isInteger(position) && (position >= 1 ) && (position <= this.res.length) ){
-      this.res.splice(position-1, 1)
+  addLink(value) {
+    if (this.str.length) {
+      this.str = this.str + `~~( ${value} )`;
       return this;
-    } ;
-    this.res = [];
-    throw new Error ("You can't remove incorrect link!");
-
-
-
-
-    
+    } else {
+      this.str = this.str + `( ${value} )`;
+      return this;
+    }
+  },
+  removeLink(position) {
+    if (
+      !Number.isInteger(position) ||
+      position <= 0 ||
+      position > this.getLength()
+    ) {
+      this.str = "";
+      throw new Error("You can't remove incorrect link!");
+    }
+    this.str = this.str
+      .split("~~")
+      .filter((item, index) => {
+        if (index !== position - 1) return item;
+      })
+      .join("~~");
+    return this;
   },
   reverseChain() {
-    this.res.reverse()
+    this.str = this.str.split("~~").reverse().join("~~");
     return this;
-    
   },
   finishChain() {
-    let resFin = '';
-    for (let i = 0; i < this.res.length; i ++ ) {
-      resFin = resFin + `~( ${this.res[i]} )~`
-    }
-    this.res = [];
-    let resFinsl = resFin.slice(1, resFin.length-1)
-    return resFinsl;
-  }
+    let finishStr = this.str;
+    this.str = "";
+    return finishStr;
+  },
 };
 
 module.exports = {
-  chainMaker
+  chainMaker,
 };
